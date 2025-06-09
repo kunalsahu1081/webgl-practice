@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "cdt2d": "^1.0.0",
+    "concaveman": "^1.2.1",
+    "earcut": "^3.0.1",
     "next": "15.3.0",
+    "poly2tri": "^1.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "whatsapp-web.js": "^1.27.0"
@@ -22,6 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
+    "sass": "^1.89.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import CanvasDrawing from "components/draw-on-canvas/canvasDrawing";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { draw_triangle } from "utils/try-drawing-triangle";
@@ -41,18 +42,7 @@ export default function Home() {
 
     return (
         <>
-            <button
-                onClick={() => {
-                    draw_triangle(gl);
-                }}
-            >
-                draw
-            </button>
-            <main className="flex min-h-screen flex-col items-center justify-between bg-white">
-                <div className="flex flex-col min-h-screen items-center justify-center border-2 border-gray-300 border-r-8">
-                    <canvas ref={canvaRef} id="current-canvas"></canvas>
-                </div>
-            </main>
+            <CanvasDrawing />
         </>
     );
 }
