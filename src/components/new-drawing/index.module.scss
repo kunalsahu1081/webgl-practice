@@ -1,0 +1,28 @@
+
+
+.newDrawing {
+
+    min-width: 400px;
+    min-height: 400px;
+
+    width: 50vw;
+    height: 60vh;
+
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    border: 1px solid black;
+    border-radius: 20px;
+    color: black;
+
+    .description {
+        //font-family: vangard, sans-serif;
+        color: #333232;
+        font-size: 16px;
+        margin-bottom: 32px;
+    }
+}

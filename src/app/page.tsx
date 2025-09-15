@@ -1,12 +1,18 @@
 "use client";
 
 import CanvasDrawing from "components/draw-on-canvas/canvasDrawing";
+import ExtrudeDrawing from "components/extrude-drawing/extrudeDrawing";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { draw_triangle } from "utils/try-drawing-triangle";
+import NewDrawing from "../components/new-drawing";
 
 export default function Home() {
     const canvaRef = useRef<HTMLCanvasElement>(null);
+
+    const [show_drawing_window, set_show_drawing_window] = useState(false);
+    const [show_extrude_window, set_show_extrude_window] = useState(false);
+
 
     const [gl, set_gl] = useState<any>(null);
 
@@ -42,7 +48,14 @@ export default function Home() {
 
     return (
         <>
-            <CanvasDrawing />
+
+            {!show_drawing_window && !show_extrude_window ? (
+                <NewDrawing onPress={() => set_show_drawing_window(true)} />
+            ) : null}
+
+            {show_drawing_window ? <CanvasDrawing onExtrude={() => set_show_extrude_window(true)} is_visible={!show_extrude_window}/> : null}
+
+            {show_drawing_window ? <ExtrudeDrawing onDrawNew={() => set_show_extrude_window(false)} is_visible={show_extrude_window}/> : null}
         </>
     );
 }

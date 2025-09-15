@@ -1,4 +1,6 @@
 import earcut  from 'earcut';
+import {bayazitDecompose} from './bayajit-conves'
+
 export const vertexShaderSource = `
         attribute vec2 a_position;
         void main() {
@@ -90,35 +92,25 @@ function interpolatePoints2px(p1: any, p2: any, step = 2, width = 0, height = 0)
 
 export const generate_face_top = (points: any[], width = 0, height = 0) => {
 
-        const pixel_points: any = [];
+        
+        const modified_points: any[] = points.flat();
 
-        points.forEach((point) => {
-                pixel_points.push(toPixelSpace(point[0], point[1], width, height));
+
+        const triangles = earcut(modified_points);
+
+
+
+        const modified_polygons: any[] = [];
+
+        triangles.forEach((point: any) => {
+                modified_polygons.push(points[point]);
         })
+       
 
-        const flat_points = pixel_points.flat();
+        // console.log(polygons, modified_polygons.flat())
 
-        const triangles = earcut(flat_points);
+        return modified_polygons;
 
-        console.log(pixel_points, width, height)
-
-        const triangle_coords = [];
-
-        for (let i = 0; i < triangles.length; i += 3) {
-            const i1 = triangles[i] * 2;
-            const i2 = triangles[i + 1] * 2;
-            const i3 = triangles[i + 2] * 2;
-
-            const p1 = toClipSpace(flat_points[i1], flat_points[i1 + 1], width, height);
-            const p2 = toClipSpace(flat_points[i2], flat_points[i2 + 1], width, height);
-            const p3 = toClipSpace(flat_points[i3], flat_points[i3 + 1], width, height);
-
-            triangle_coords.push(p1);
-            triangle_coords.push(p2);
-            triangle_coords.push(p3);
-        }
-
-        console.log(triangle_coords)
-
-        return triangle_coords;
+        // console.log(polygons);
+        
     };

@@ -1,0 +1,69 @@
+
+.stackContainer {
+    z-index: 11;
+    width: 900px;
+    margin: 20vh auto 0 auto;
+
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.experienceRow {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+}
+
+.stackHeader {
+    color: #64ffda;
+    font-family: vangard;
+    margin-bottom: 18px;
+}
+
+
+.stackButton {
+
+    padding: 8px 20px;
+    border-radius: 25px;
+    position: relative;
+    z-index: 11;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+
+
+}
+
+.stackButton::after {
+    z-index: 0;
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 100%;
+    transform: scaleY(0);
+    transform-origin: bottom center;
+    background: green;
+    border-radius: 25px;
+    transition: transform 0.5s;
+}
+
+.stackButton:hover {
+    color: white;
+    border: none;
+}
+
+.stackButton:hover::after {
+    transform: scaleY(1);
+}
+
+

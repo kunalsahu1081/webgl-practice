@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import styles from "./cansvasDrawing.module.scss";
 import {
     fragmentShaderSource,
@@ -6,12 +6,16 @@ import {
     interpolatePoints,
     vertexShaderSource,
 } from "utils/draw-on-canvas/draw-shader-strings";
-import { createProgram, createShader } from "utils/gen-shaders";
+import {createProgram, createShader} from "utils/gen-shaders";
 import concaveman from "concaveman";
-import { getPackedSettings } from "http2";
-import { draw_triangle } from "utils/try-drawing-triangle";
+import {getPackedSettings} from "http2";
+import {draw_triangle} from "utils/try-drawing-triangle";
+import ButtonN from "../button";
 
-const CanvasDrawing = () => {
+let window_width = null;
+let window_height = null;
+
+const CanvasDrawing = ({is_visible, onExtrude}) => {
     // refs
     const drawCanvasRef = useRef<any>(null);
     const glRef = useRef<any>(null);
@@ -21,26 +25,49 @@ const CanvasDrawing = () => {
     // states
     const [points, setPoints] = useState<any[]>([]);
     const [drawing, setDrawing] = useState(false);
+    const [draw_new, set_draw_new] = useState(false);
+
 
     const getConcavePolygon = () => {
         const rect = drawCanvasRef.current.getBoundingClientRect();
 
-        const new_points = interpolatePoints(
-            points,
-            0,
-            rect.width,
-            rect.height
-        );
+        const faces_arr = [];
+        const polygon_arr = [];
 
-        const polygon = concaveman(new_points);
+        points.forEach((point_arr) => {
 
-        const faces = (points, rect.width, rect.height);
+            const new_points = interpolatePoints(
+                point_arr,
+                0,
+                rect.width,
+                rect.height
+            );
 
-        // console.log(points, new_points);
+            const polygon = concaveman(new_points);
 
-        // draw_triangle(glRef.current, faces);
+            const faces = generate_face_top(polygon, rect.width, rect.height);
 
-        setPoints(polygon ?? []);
+            faces_arr.push(faces);
+            polygon_arr.push(polygon);
+
+
+        });
+
+        if (faces_arr.length) {
+            const new_event = new CustomEvent("drawextrude", {
+                detail: {faces: faces_arr, polygon: polygon_arr},
+            });
+
+            if (document.getElementById("extrudeId")) {
+                document.getElementById("extrudeId")?.dispatchEvent(new_event);
+            } else {
+                console.log("no ducasdfasd");
+            }
+
+            onExtrude();
+        }
+
+        // setPoints(faces ?? []);
     };
 
     const toClipSpace = (
@@ -62,12 +89,6 @@ const CanvasDrawing = () => {
         }
 
         glRef.current = gl;
-
-        // Vertex shader program
-        const vertexString = vertexShaderSource;
-
-        // Fragment shader program
-        const fragmentString = fragmentShaderSource;
 
         const vertexShader = createShader(
             gl,
@@ -96,24 +117,33 @@ const CanvasDrawing = () => {
 
         gl.clearColor(1, 1, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        window_width = window.innerWidth;
+        window_height = window.innerHeight - 100;
     }, []);
 
     useEffect(() => {
-        if (!points.length && glRef.current) {
-            const gl = glRef.current;
-            gl.clearColor(1, 1, 1, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
-
-        if (!glRef.current || points.length < 2) return;
         const gl = glRef.current;
+        gl?.clear(gl.COLOR_BUFFER_BIT);
 
-        const vertices = new Float32Array(points.flat());
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferRef.current);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        points.forEach((point_arr, index) => {
+            if (!point_arr.length && glRef.current && index === 0) {
+                const gl = glRef.current;
+                gl.clearColor(1, 1, 1, 1);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
 
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.drawArrays(gl.LINE_STRIP, 0, points.length);
+            if (!glRef.current || point_arr.length < 2) return;
+
+
+            const vertices = new Float32Array(point_arr.flat());
+            gl.bindBuffer(gl.ARRAY_BUFFER, bufferRef.current);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+
+            gl.drawArrays(gl.LINE_STRIP, 0, point_arr.length);
+        })
+
     }, [points]);
 
     const handleMouseDown = (e: any) => {
@@ -125,19 +155,30 @@ const CanvasDrawing = () => {
             rect.width,
             rect.height
         );
-        setPoints((prev) => [...prev, point]);
+        if (draw_new || !points.length) {
+            points.push([point]);
+            setPoints([...points]);
+        } else {
+            points[points.length - 1].push(point);
+            setPoints([...points]);
+        }
+        set_draw_new(false);
     };
 
     const handleMouseMove = (e: any) => {
         if (!drawing) return;
         const rect = drawCanvasRef.current.getBoundingClientRect();
+
+        // console.log(e.clientY, rect);
+
         const point = toClipSpace(
             e.clientX - rect.left,
             e.clientY - rect.top,
             rect.width,
             rect.height
         );
-        setPoints((prev) => [...prev, point]);
+        points[points.length - 1].push(point);
+        setPoints([...points]);
     };
 
     const handleMouseUp = () => {
@@ -146,18 +187,23 @@ const CanvasDrawing = () => {
 
     return (
         <>
-            <section className={styles.drawingBoardContainer}>
-                <button onClick={() => setPoints([])}>clear</button>
+            <section className={styles.drawingBoardContainer} style={{display: is_visible ? null : 'none'}}>
 
-                <button onClick={() => getConcavePolygon()}>
-                    make polygon
-                </button>
+                <div className={styles.buttonContainer}>
+                    <ButtonN onPress={() => setPoints([])}>Clear</ButtonN>
+
+                    <ButtonN onPress={() => set_draw_new(true)}>New Extrude</ButtonN>
+
+                    <ButtonN onPress={() => getConcavePolygon()}>
+                        Make Polygon
+                    </ButtonN>
+                </div>
 
                 <canvas
                     ref={drawCanvasRef}
-                    width={600}
-                    height={600}
-                    style={{ border: "1px solid black", touchAction: "none" }}
+                    width={1200}
+                    height={800}
+                    style={{border: "1px solid black", touchAction: "none", width: '100%', height: '100%'}}
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}

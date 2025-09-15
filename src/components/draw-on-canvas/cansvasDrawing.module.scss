@@ -2,4 +2,17 @@
 
 .drawingBoardContainer {
         margin: auto;
+        width: 100vw;
+        flex: 1 1;
+        position: relative;
+}
+
+.buttonContainer {
+        position: absolute;
+        width: 100vw;
+        gap: 24px;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        top: 30px;
 }

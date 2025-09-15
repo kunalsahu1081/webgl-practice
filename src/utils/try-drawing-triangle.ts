@@ -1,94 +1,134 @@
 import {try_vertex_shader, try_fragment_shader} from './shaders-strings';
 import {createShader, createProgram} from './gen-shaders';
-import { off } from 'process';
+import {off} from 'process';
 
-export const draw_triangle = (gl: WebGLRenderingContext, geometry: any[] = []) => {
+export const draw_triangle = (gl: WebGLRenderingContext,) => {
+
+    const vertex_shader_source = try_vertex_shader;
+
+    const fragment_shader_source = try_fragment_shader;
+
+    const vertex_shader = createShader(gl, gl.VERTEX_SHADER, vertex_shader_source);
+
+    const fragment_shader = createShader(gl, gl.FRAGMENT_SHADER, fragment_shader_source);
+
+    const program = createProgram(gl, vertex_shader, fragment_shader);
+
+    // position of attribute a_position in the program
+    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
+    const positionBuffer = gl.createBuffer();
 
 
-        const vertex_shader_source = try_vertex_shader;
+    // position of attribute a_color in the program
+    const colorAttributeLocation = gl.getAttribLocation(program, 'a_color');
 
-        const fragment_shader_source = try_fragment_shader;
+    const colorBuffer = gl.createBuffer();
+    set_colors(gl, colorBuffer);
 
-        const vertex_shader = createShader(gl, gl.VERTEX_SHADER, vertex_shader_source);
+    gl.useProgram(program);
 
-        const fragment_shader = createShader(gl, gl.FRAGMENT_SHADER, fragment_shader_source);
+    // pass data to position buffer attribute
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-        const program = createProgram(gl, vertex_shader, fragment_shader);
+    const size = 3;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
 
-        // position of attribute a_position in the program
-        const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+    gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
 
-        const positionBuffer = gl.createBuffer();
-        set_geometry(gl, positionBuffer, geometry);
+    gl.enableVertexAttribArray(colorAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
-        // position of attribute a_color in the program
-        const colorAttributeLocation = gl.getAttribLocation(program, 'a_color');
+    gl.vertexAttribPointer(colorAttributeLocation, 4, type, normalize, stride, offset);
 
-        const colorBuffer = gl.createBuffer();
-        set_colors(gl, colorBuffer);
+    return function ( geometry: any[] = [], geometry_2: any[] = [], boundary: any[] = []) {
+        for (let i = 0; i < boundary.length; i += 9) {
 
-        gl.useProgram(program);
+            set_geometry(gl, positionBuffer, boundary.slice(i, i + 9));
 
-        // pass data to position buffer attribute
-        gl.enableVertexAttribArray(positionAttributeLocation);
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            const primitiveType = gl.TRIANGLES;
 
-        const size = 2;
-        const type = gl.FLOAT;
-        const normalize = false;
-        const stride = 0;
-        const offset = 0;
-        gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
+            gl.drawArrays(primitiveType, offset, 3);
+
+        }
 
 
         // pass data to color buffer attribute
 
+        // set_colors(gl, colorBuffer);
+
         gl.enableVertexAttribArray(colorAttributeLocation);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
-        
-        const c_size = 4;
+        gl.vertexAttribPointer(colorAttributeLocation, 4, type, normalize, stride, offset);
 
-        gl.vertexAttribPointer(colorAttributeLocation, c_size, type, normalize, stride, offset);
+        for (let i = 0; i < geometry.length; i += 9) {
 
-        // draw triangles
-        const primitiveType = gl.TRIANGLES;
-        const count = 6;
+            set_geometry(gl, positionBuffer, geometry.slice(i, i + 9));
 
-        gl.drawArrays(primitiveType, offset, count);
+            const primitiveType = gl.TRIANGLES;
 
+            gl.drawArrays(primitiveType, offset, 3);
+
+        }
+
+        // pass data to color buffer attribute
+
+        set_colors(gl, colorBuffer);
+
+        gl.enableVertexAttribArray(colorAttributeLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+
+        gl.vertexAttribPointer(colorAttributeLocation, 4, type, normalize, stride, offset);
+
+        for (let i = 0; i < geometry_2.length; i += 9) {
+
+
+            set_geometry(gl, positionBuffer, geometry_2.slice(i, i + 9));
+
+            // draw triangles
+            const primitiveType = gl.TRIANGLES;
+
+            gl.drawArrays(primitiveType, offset, 3);
+
+        }
+    }
 
 }
 
 
 const set_geometry = (gl: WebGLRenderingContext, positionBuffer: any, geometry: any) => {
 
-        const triangle_2d_cooords = geometry
+    const triangle_2d_cooords = geometry
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangle_2d_cooords), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangle_2d_cooords), gl.STATIC_DRAW);
 
 }
 
 function set_colors(gl: WebGLRenderingContext, colorBuffer: any) {
-  // Pick 2 random colors.
-        var r1 = Math.random();
-        var b1 = Math.random();
-        var g1 = Math.random();
+    // Pick 2 random colors.
+    var r1 = Math.random();
+    var b1 = Math.random();
+    var g1 = Math.random();
 
-        var r2 = Math.random();
-        var b2 = Math.random();
-        var g2 = Math.random();
+    var r2 = r1;
+    var b2 = b1;
+    var g2 = g1;
 
-        const color_coordinates = [ r1, b1, g1, 1,
-                r2, b2, g2, 1,
-                r1, b1, g1, 1,
-                r1, b1, g1, 1,
-                r2, b2, g2, 1,
-                r2, b2, g2, 1];
+    const color_coordinates = [r1, b1, g1, 1,
+        r2, b2, g2, 1,
+        r1, b1, g1, 1,
+        r1, b1, g1, 1,
+        r2, b2, g2, 1,
+        r2, b2, g2, 1];
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
-        gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(color_coordinates), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color_coordinates), gl.STATIC_DRAW);
 }
