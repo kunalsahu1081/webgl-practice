@@ -12,8 +12,7 @@ import {getPackedSettings} from "http2";
 import {draw_triangle} from "utils/try-drawing-triangle";
 import ButtonN from "../button";
 
-let window_width = null;
-let window_height = null;
+
 
 const CanvasDrawing = ({is_visible, onExtrude}) => {
     // refs
@@ -31,8 +30,8 @@ const CanvasDrawing = ({is_visible, onExtrude}) => {
     const getConcavePolygon = () => {
         const rect = drawCanvasRef.current.getBoundingClientRect();
 
-        const faces_arr = [];
-        const polygon_arr = [];
+        const faces_arr:any = [];
+        const polygon_arr:any = [];
 
         points.forEach((point_arr) => {
 
@@ -118,8 +117,7 @@ const CanvasDrawing = ({is_visible, onExtrude}) => {
         gl.clearColor(1, 1, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        window_width = window.innerWidth;
-        window_height = window.innerHeight - 100;
+
     }, []);
 
     useEffect(() => {
@@ -187,7 +185,7 @@ const CanvasDrawing = ({is_visible, onExtrude}) => {
 
     return (
         <>
-            <section className={styles.drawingBoardContainer} style={{display: is_visible ? null : 'none'}}>
+            <section className={styles.drawingBoardContainer} style={{display: is_visible ? undefined : 'none'}}>
 
                 <div className={styles.buttonContainer}>
                     <ButtonN onPress={() => setPoints([])}>Clear</ButtonN>

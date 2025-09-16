@@ -80,7 +80,7 @@ function interpolatePoints2px(p1: any, p2: any, step = 2, width = 0, height = 0)
         const distance = Math.hypot(dx, dy);
 
         const count = Math.floor(distance / step);
-        const points = [];
+        const points:any = [];
 
         for (let i = 1; i < count; i++) {
                 const t = i / count;

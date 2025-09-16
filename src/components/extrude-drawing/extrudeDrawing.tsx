@@ -6,7 +6,7 @@ import {draw_triangle} from "utils/try-drawing-triangle";
 import ButtonN from "../button";
 
 
-let drawTriangleFunc = null;
+let drawTriangleFunc: any = null;
 
 const ExtrudeDrawing = ({is_visible, onDrawNew}) => {
     const extrudeCanvasRef = useRef<any>(null);
@@ -36,9 +36,9 @@ const ExtrudeDrawing = ({is_visible, onDrawNew}) => {
     useEffect(() => {
         if (polygon?.length && points.length) {
 
-            let polygon_triangles = [];
-            let modified_points_3 = [];
-            let modified_points_4 = [];
+            let polygon_triangles:any = [];
+            let modified_points_3:any = [];
+            let modified_points_4:any = [];
 
             drawTriangleFunc = draw_triangle(glRef.current);
 
@@ -117,7 +117,7 @@ const ExtrudeDrawing = ({is_visible, onDrawNew}) => {
 
     return (
         <>
-            <section id={'extrudeId'} className={styles.drawingBoardContainer} style={{display: is_visible ? null : 'none', height: is_visible ? null : 0}}>
+            <section id={'extrudeId'} className={styles.drawingBoardContainer} style={{display: is_visible ? undefined : 'none'}}>
 
                 <div className={styles.buttonContainer}>
                     <ButtonN onPress={onDrawNew}>Draw New</ButtonN>
