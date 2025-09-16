@@ -1,5 +1,4 @@
 import earcut  from 'earcut';
-import {bayazitDecompose} from './bayajit-conves'
 
 export const vertexShaderSource = `
         attribute vec2 a_position;
