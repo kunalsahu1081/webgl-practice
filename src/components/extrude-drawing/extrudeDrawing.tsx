@@ -49,7 +49,7 @@ const ExtrudeDrawing = ({is_visible, onDrawNew}) => {
                 });
 
                 const modified_points_2 = polygon[index].map((point) => {
-                    return [point[0] + 0.1, point[1] + 0.1, 0.2];
+                    return [point[0] + 0.05, point[1] + 0.05, 0.2];
                 });
 
                 modified_points_3 = [...modified_points_3, ...points[index].map((point) => {
@@ -57,7 +57,7 @@ const ExtrudeDrawing = ({is_visible, onDrawNew}) => {
                 })]
 
                 modified_points_4 = [...modified_points_4, ...points[index].map((point) => {
-                    return [point[0] + 0.1, point[1] + 0.1, 0.2];
+                    return [point[0] + 0.05, point[1] + 0.05, 0.2];
                 })]
 
                 for (let i = 0; i + 1 < modified_points?.length; i += 1) {
